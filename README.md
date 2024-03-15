@@ -49,7 +49,7 @@ Before using the EMR Job Runner, ensure you have the following:
 
    Replace `your_access_key_id`, `your_secret_access_key`, `your_aws_region`, `your_emr_cluster_id`, `your_s3_bucket_name`, `your_api_key_value`, and `your_s3_path` with your actual AWS credentials and configurations.
 
-   NB: It's good practice to export the necessary secret keys as environment variables before running the Flask application. Use the following commands: `export AWS_ACCESS_KEY_ID='your_aws_access_key_id'`
+   NB: It's good practice to export the necessary secret keys as environment variables before running the Flask application. Use the following commands: `export AWS_ACCESS_KEY_ID=your_aws_access_key_id`
 
 5. Ensure your AWS IAM user has the necessary permissions to access EMR resources and perform the required actions.
 

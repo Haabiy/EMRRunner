@@ -26,12 +26,8 @@ pip3 install \
     Unidecode==0.4.1 \
     boto3==1.26.53 \
     numpy==1.26.3 \
-    pandas==1.5.3 \
-    polars==0.20.5 \
     rapidfuzz==3.1.1 \
-    s3fs==2023.4.0 \
-    SQLAlchemy==1.4.47 \
-    tqdm==4.66.1
+    SQLAlchemy==1.4.47 
 
 # List installed packages again (optional)
 sudo python3 -m pip list
