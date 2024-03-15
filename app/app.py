@@ -35,6 +35,7 @@ def start_emr_job():
         step = request.json.get('step')
         s3_path = os.getenv("S3_PATH")
         #### SIMPLE STEP
+        # Testjob.py is our main.py
         step_config = {
             'Name': job_name,
             'ActionOnFailure': 'CONTINUE',
