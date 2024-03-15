@@ -95,7 +95,7 @@ For instance :
 
 ## Deployment Mode
 
-When specifying the deployment mode as `cluster`, ensure to include the necessary dependencies such as `job.py` or `main.py` along with your job configuration. Additionally, include the following Spark configuration to specify the python path we would like to use:
+When specifying the deployment mode as `cluster`, ensure to include the necessary dependencies such as `job.py` and `main.py` --`Testjob.py`--in our case--along with your job configuration. Additionally, include the following Spark configuration to specify the python path we would like to use:
 
 ```
 --conf spark.pyspark.python=/usr/bin/python3
@@ -111,7 +111,7 @@ To manage dependencies and ensure compatibility, it's recommended to use virtual
 
 A bootstrap action is a script that runs on each node in an Amazon EMR cluster before the primary application starts. It is commonly used to set up the environment and install necessary dependencies.
 
-Here's an example of a bootstrap action script: [bootstrap action script](https://github.com/Haabiy/EMRRunner/blob/aa341b7ecd34fd157dca688bfaf7eb0d257285cb/bootstrap.sh)
+Here's an example of a bootstrap action script: [bootstrap.sh](https://github.com/Haabiy/EMRRunner/blob/aa341b7ecd34fd157dca688bfaf7eb0d257285cb/bootstrap.sh)
 
 
 - This bootstrap action script creates and activates a virtual environment, installs required packages using pip, and lists installed packages for verification purposes. Using a virtual environment helps to avoid dependency issues and ensures consistent package installations across environments. (Needs to be configured during the creation of EMR cluster)
