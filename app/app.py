@@ -43,11 +43,10 @@ def start_emr_job():
                 'Args': [
                     'bash',
                     '-c',
-                    'source /home/hadoop/myenv/bin/activate && '  # Activate the virtual environment
                     'cd /home/hadoop/ && ' 
                     f'aws s3 sync {s3_path}/{step}/ /home/hadoop/{step}/ && '
                     f'cd /home/hadoop/{step} && '
-                    'spark-submit --deploy-mode cluster --conf spark.pyspark.python=/usr/bin/python3 --py-files job.py Testjob.py '
+                    'spark-submit --deploy-mode cluster --conf spark.pyspark.python=/home/hadoop/myenv/bin/python --py-files job.py Testjob.py '
                 ] 
             }
         }

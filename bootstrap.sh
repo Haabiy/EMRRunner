@@ -1,17 +1,17 @@
 #!/bin/bash -xe
 
 # Create and activate a virtual environment
-python3 -m venv myenv
-source myenv/bin/activate
+python3 -m venv /home/hadoop/myenv
+source /home/hadoop/myenv/bin/activate
+
 # Install pip for Python 3.x
 sudo yum install python3-pip -y
 sudo yum install -y python-psycopg2
-# List installed packages (optional)
-sudo python3 -m pip list
 
 # Install required packages
 pip3 install \
     boto3==1.26.53 \
+    pyspark==3.5.0 \
     numpy==1.26.3 \
     openpyxl==3.1.2 \
     pandas==1.5.3 \
@@ -29,8 +29,6 @@ pip3 install \
     rapidfuzz==3.1.1 \
     SQLAlchemy==1.4.47 
 
-# List installed packages again (optional)
-sudo python3 -m pip list
 deactivate
 
 
