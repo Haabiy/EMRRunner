@@ -111,7 +111,7 @@ To manage dependencies and ensure compatibility, it's recommended to use virtual
 
 A bootstrap action is a script that runs on each node in an Amazon EMR cluster before the primary application starts. It is commonly used to set up the environment and install necessary dependencies.
 
-Here's an example of a bootstrap action script: [bootstrap.sh](https://github.com/Haabiy/EMRRunner/blob/aa341b7ecd34fd157dca688bfaf7eb0d257285cb/bootstrap.sh)
+Here's an example of a bootstrap action script: [bootstrap.sh](https://github.com/Haabiy/EMRRunner/blob/b04cae71931c66cc79c817206bd85288d33cc1f5/bootstrap.sh)
 
 
 - This bootstrap action script creates and activates a virtual environment, installs required packages using pip, and lists installed packages for verification purposes. Using a virtual environment helps to avoid dependency issues and ensures consistent package installations across environments. (Needs to be configured during the creation of EMR cluster)
