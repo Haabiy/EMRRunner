@@ -54,7 +54,7 @@ The EMR Job Runner is a Flask-based application that interfaces with AWS EMR (El
    API_KEY_VALUE=<your_api_key>
    ```
 
-   **Note:** It is recommended to export these keys in the terminal explicitly before running the application to ensure they are available in your environment.
+   <span style='color:#7493c4'> ⦿ Note: It is recommended to export these keys in the terminal explicitly before running the application to ensure they are available in your environment.</span>
 
 ## Configuration
 
@@ -188,7 +188,7 @@ To ensure the application works correctly in CI/CD pipelines, you need to set en
    - `API_KEY_VALUE`
 
 These secrets will be securely accessed by the CI pipeline during execution;
-Here’s a basic example of a GitHub Actions workflow:
+Here’s an example of a GitHub Actions workflow:
 
 ```yaml
 name: CI
