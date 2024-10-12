@@ -50,7 +50,6 @@ def test_job_request_schema_invalid():
 def test_start_emr_job_success(mock_emr_client, client):
     """Integration test for successful job start."""
     mock_emr_client.add_job_flow_steps.return_value = {'StepIds': ['s-123456']}
-    print("here is the api key value:{API_SECRET}")
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
                            headers={"X-Api-Key": API_KEY_VALUE})
