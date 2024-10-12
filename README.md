@@ -203,5 +203,3 @@ jobs:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
-
-This `README.md` now includes the necessary details about `dependencies.py` and `job.py`. Let me know if you need any more changes!
