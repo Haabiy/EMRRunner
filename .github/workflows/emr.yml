@@ -25,7 +25,8 @@ jobs:
           echo "EMR_CLUSTER_ID=${{ secrets.EMR_CLUSTER_ID }}" >> $GITHUB_ENV
           echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> $GITHUB_ENV
           echo "S3_PATH=${{ secrets.S3_PATH }}" >> $GITHUB_ENV
-          echo "API_KEY_VALUE=${{ secrets.YOUR_TEST_API_KEY }}" >> $GITHUB_ENV
+          echo "API_KEY_VALUE=${{ secrets.API_KEY_VALUE}}" >> $GITHUB_ENV
+          echo "TEST_API_KEY=${{ secrets.TEST_API_KEY}}" >> $GITHUB_ENV
       - name: Run tests
         run: |
           . venv/bin/activate
