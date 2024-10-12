@@ -11,7 +11,7 @@ Date: October 12, 2024
 import pytest
 from unittest.mock import patch, MagicMock
 from marshmallow import ValidationError
-from app.emr_job_api import app, create_step_config, JobRequestSchema, API_SECRET
+from app.emr_job_api import app, create_step_config, JobRequestSchema
 
 @pytest.fixture
 def client():
@@ -72,7 +72,7 @@ def test_start_emr_job_invalid_input(mock_emr_client, client):
     """Integration test for invalid input."""
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job"},  # Missing 'step'
-                           headers={"X-Api-Key": API_SECRET})
+                           headers={"X-Api-Key": 'test_api_key'})
     
     assert response.status_code == 400
     assert 'error' in response.json
@@ -84,7 +84,7 @@ def test_start_emr_job_aws_error(mock_emr_client, client):
     
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": API_SECRET})
+                           headers={"X-Api-Key": 'test_api_key'})
     
     assert response.status_code == 500
     assert 'error' in response.json
