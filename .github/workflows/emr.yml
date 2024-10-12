@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: CI
 
 on: [push, pull_request]
@@ -16,15 +17,16 @@ jobs:
           python -m venv venv
           . venv/bin/activate
           pip install -r requirements.txt
+      - name: Set up environment variables
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+          echo "EMR_CLUSTER_ID=${{ secrets.EMR_CLUSTER_ID }}" >> $GITHUB_ENV
+          echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "S3_PATH=${{ secrets.S3_PATH }}" >> $GITHUB_ENV
+          echo "API_KEY_VALUE=${{ secrets.YOUR_TEST_API_KEY }}" >> $GITHUB_ENV
       - name: Run tests
-        env: 
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'eu-west-3'  
-          EMR_CLUSTER_ID: ${{ secrets.EMR_CLUSTER_ID }}
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-          S3_PATH: ${{ secrets.S3_PATH }}
-          API_KEY_VALUE: ${{ secrets.API_KEY_VALUE }}
         run: |
           . venv/bin/activate
           pytest --ignore=app/__init__.py
