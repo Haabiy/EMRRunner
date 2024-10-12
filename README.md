@@ -1,5 +1,3 @@
-Here's the updated `README.md` that includes the details about `dependencies.py` and `job.py` for testing:
-
 # EMR Job Runner
 
 ## Overview
@@ -171,7 +169,26 @@ if __name__ == "__main__":
 
 ## Continuous Integration
 
-To set up continuous integration, you can configure your CI tool (like GitHub Actions, Travis CI, etc.) to run `pytest` on every push or pull request. Here’s a basic example of a GitHub Actions workflow:
+To set up continuous integration, you can configure your CI tool (like GitHub Actions) to run `pytest` on every push or pull request. 
+
+### Setting Environment Variables
+
+To ensure the application works correctly in CI/CD pipelines, you need to set environment variables. This can be done by following these steps:
+
+1. Go to **Settings** in your repository.
+2. Navigate to **Secrets and Variables**.
+3. Click on **Actions**.
+4. Under **Repository Secrets**, add the following environment variables:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `AWS_REGION`
+   - `EMR_CLUSTER_ID`
+   - `BUCKET_NAME`
+   - `S3_PATH`
+   - `API_KEY_VALUE`
+
+These secrets will be securely accessed by the CI pipeline during execution;
+Here’s a basic example of a GitHub Actions workflow:
 
 ```yaml
 name: CI
@@ -181,17 +198,29 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EMR_CLUSTER_ID: ${{ secrets.EMR_CLUSTER_ID }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      S3_PATH: ${{ secrets.S3_PATH }}
+      API_KEY_VALUE: ${{ secrets.API_KEY_VALUE }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out the code
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: |
           python -m venv venv
           . venv/bin/activate
           pip install -r requirements.txt
+
       - name: Run tests
         run: |
           . venv/bin/activate
@@ -200,5 +229,4 @@ jobs:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
+See More: [LICENSE](LICENSE)
