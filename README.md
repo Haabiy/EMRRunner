@@ -174,7 +174,6 @@ if __name__ == "__main__":
 To set up continuous integration, you can configure your CI tool (like GitHub Actions, Travis CI, etc.) to run `pytest` on every push or pull request. Here’s a basic example of a GitHub Actions workflow:
 
 ```yaml
-# .github/workflows/ci.yml
 name: CI
 
 on: [push, pull_request]

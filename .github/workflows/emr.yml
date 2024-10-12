@@ -14,16 +14,20 @@ jobs:
       S3_PATH: ${{ secrets.S3_PATH }}
       API_KEY_VALUE: ${{ secrets.API_KEY_VALUE }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out the code
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: |
           python -m venv venv
           . venv/bin/activate
           pip install -r requirements.txt
+
       - name: Run tests
         run: |
           . venv/bin/activate
