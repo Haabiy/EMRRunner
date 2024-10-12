@@ -11,8 +11,7 @@ Date: October 12, 2024
 import pytest
 from unittest.mock import patch, MagicMock
 from marshmallow import ValidationError
-from app.emr_job_api import app, create_step_config, JobRequestSchema, API_SECRET
-import os
+from app.emr_job_api import app, create_step_config, JobRequestSchema, API_KEY_VALUE
 
 @pytest.fixture
 def client():
@@ -51,10 +50,10 @@ def test_job_request_schema_invalid():
 def test_start_emr_job_success(mock_emr_client, client):
     """Integration test for successful job start."""
     mock_emr_client.add_job_flow_steps.return_value = {'StepIds': ['s-123456']}
-    print("here is the api key value:}", os.getenv('API_KEY_VALUE'))
+    print("here is the api key value:{API_SECRET}")
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": os.getenv('API_KEY_VALUE')})
+                           headers={"X-Api-Key": API_KEY_VALUE})
     
     assert response.status_code == 200
     assert response.json['success'] == True
@@ -73,7 +72,7 @@ def test_start_emr_job_invalid_input(mock_emr_client, client):
     """Integration test for invalid input."""
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job"},  # Missing 'step'
-                           headers={"X-Api-Key": os.getenv('API_KEY_VALUE')})
+                           headers={"X-Api-Key": API_KEY_VALUE})
     
     assert response.status_code == 400
     assert 'error' in response.json
@@ -85,7 +84,7 @@ def test_start_emr_job_aws_error(mock_emr_client, client):
     
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": os.getenv('API_KEY_VALUE')})
+                           headers={"X-Api-Key": API_KEY_VALUE})
     
     assert response.status_code == 500
     assert 'error' in response.json

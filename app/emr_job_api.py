@@ -24,7 +24,7 @@ EMR_CONFIG = {
     'S3_PATH': os.getenv('S3_PATH')
 }
 
-API_SECRET = os.getenv('API_KEY_VALUE')
+API_KEY_VALUE = os.getenv('API_KEY_VALUE')
 
 # Initialize Boto3 EMR client
 emr_client = boto3.client('emr', 
