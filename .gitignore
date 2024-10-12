@@ -1,0 +1,27 @@
+# Dependency directories
+/node_modules
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+__pycache__
+# Environment variables file (if using .env)
+.env
+
+# Editor/IDE files
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Build output
+/build
+/dist
+
+#Pytest cache
+.pytest_cache
+
+# VENV
+venv
