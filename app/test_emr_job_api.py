@@ -1,13 +1,3 @@
-"""
-test_app.py: Test suite for the EMR Job API
-
-This module contains unit tests and integration tests for the EMR Job API.
-It uses pytest for test execution and mocking.
-
-Author: Your Name
-Date: October 12, 2024
-"""
-
 import pytest
 from unittest.mock import patch, MagicMock
 from marshmallow import ValidationError
