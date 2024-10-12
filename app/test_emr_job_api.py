@@ -53,7 +53,7 @@ def test_start_emr_job_success(mock_emr_client, client):
     
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": API_SECRET})
+                           headers={"X-Api-Key": "test_api_key"})
     
     assert response.status_code == 200
     assert response.json['success'] == True
