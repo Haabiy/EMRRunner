@@ -193,7 +193,7 @@ Here’s a basic example of a GitHub Actions workflow:
 ```yaml
 name: CI
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
