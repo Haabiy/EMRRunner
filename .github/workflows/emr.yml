@@ -1,25 +1,34 @@
-name: Docker CI
+name: CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EMR_CLUSTER_ID: ${{ secrets.EMR_CLUSTER_ID }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      S3_PATH: ${{ secrets.S3_PATH }}
+      API_KEY_VALUE: ${{ secrets.API_KEY_VALUE }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Check out the code
+        uses: actions/checkout@v3
 
-    # Post checkout repo step
-    - name: Post checkout repo
-      run: echo "Actions completed successfully."
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
 
-    # Build Docker image
-    - name: Build Docker image
-      run: docker build -t emr-api .
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          . venv/bin/activate
+          pytest --ignore=app/__init__.py

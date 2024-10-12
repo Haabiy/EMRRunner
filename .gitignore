@@ -19,3 +19,9 @@ logs/
 # Build output
 /build
 /dist
+
+#Pytest cache
+.pytest_cache
+
+# VENV
+venv
