@@ -1,134 +1,165 @@
+Here's a formatted and visually appealing version of your `README.md` for the EMR Job Runner project, using Markdown features for better readability:
+
+```markdown
 # EMR Job Runner
 
-This application facilitates the submission and monitoring of jobs on Amazon Elastic MapReduce (EMR) clusters through a Flask API.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Deployment Mode](#deployment-mode)
-- [Dependency Management](#dependency-management)
-- [Troubleshooting](#troubleshooting)
+![EMR Job Runner](https://via.placeholder.com/800x200?text=EMR+Job+Runner)  <!-- You can replace this with an actual logo or relevant image -->
 
 ## Overview
 
-The EMR Job Runner provides a RESTful API to start and monitor jobs on EMR clusters. It enables users to submit job configurations and automatically adds them to the specified EMR cluster for execution. Additionally, users can check the status of individual job steps and monitor the overall cluster status through the provided endpoints.
+The **EMR Job Runner** is a Flask-based application that interfaces with **AWS EMR (Elastic MapReduce)** to manage and execute **Spark jobs**. This application allows users to start EMR jobs by providing job names and steps, and it handles API key validation for security.
 
-## Prerequisites
+## Features
 
-Before using the EMR Job Runner, ensure you have the following:
+- 🚀 Start EMR jobs with specified configurations.
+- ✅ Validate input using **Marshmallow** schemas.
+- ⚠️ Handle errors gracefully and provide meaningful error messages.
+- 🔐 Built-in decorators for API key validation.
 
-- AWS IAM credentials with permissions to access EMR resources.
-- An existing EMR cluster set up on your AWS account.
-- Python installed on your local machine or server.
-- [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html) - installed (`pip install boto3`).
-- [Flask](https://flask.palletsprojects.com/en/2.1.x/installation/) - installed (`pip install Flask`).
-- [dotenv](https://pypi.org/project/python-dotenv/) - installed (`pip install python-dotenv`).
+## Table of Contents
 
-## Setup
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Testing](#testing)
+- [Continuous Integration](#continuous-integration)
 
-1. Clone this repository to your local machine or server : https://github.com/Haabiy/EMRRunner.git
-2. Navigate to the project directory and install dependencies using `pip install -r requirements.txt`.
-3. Set up your environment variables by creating a `.env` file in the project root directory. Include the following variables:
+## Installation
 
-   ```
-   
-   AWS_ACCESS_KEY_ID='YOUR_AWS_ACCESS_KEY_ID'
-   AWS_SECRET_ACCESS_KEY='YOUR_AWS_SECRET_ACCESS_KEY'
-   
-   EMR_CLUSTER_ID='YOUR_EMR_CLUSTER_ID'
-   API_KEY_VALUE='YOUR_API_KEY_VALUE'
-   
-   BUCKET_NAME='YOUR_BUCKET_NAME'
-   AWS_REGION='YOUR_AWS_REGION'
-   S3_PATH='YOUR_S3_PATH'
+1. **Clone this repository:**
 
+   ```bash
+   git clone <repository_url>
+   cd EMRRunner
    ```
 
-   Replace `your_access_key_id`, `your_secret_access_key`, `your_aws_region`, `your_emr_cluster_id`, `your_s3_bucket_name`, `your_api_key_value`, and `your_s3_path` with your actual AWS credentials and configurations.
+2. **Create a virtual environment and activate it:**
 
-   NB: It's good practice to export the necessary secret keys as environment variables before running the Flask application. Use the following commands: `export AWS_ACCESS_KEY_ID=your_aws_access_key_id`
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
-5. Ensure your AWS IAM user has the necessary permissions to access EMR resources and perform the required actions.
+3. **Install the required dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Create a `.env` file** in the root directory of the project and set your AWS and API key values:
+
+   ```plaintext
+   AWS_ACCESS_KEY_ID=<your_access_key>
+   AWS_SECRET_ACCESS_KEY=<your_secret_key>
+   AWS_REGION=<your_region>
+   EMR_CLUSTER_ID=<your_cluster_id>
+   BUCKET_NAME=<your_bucket_name>
+   S3_PATH=<your_s3_path>
+   API_KEY_VALUE=<your_api_key>
+   ```
+
+## Configuration
+
+The application reads configuration values from environment variables stored in a `.env` file. Ensure you fill in the required keys as specified above.
 
 ## Usage
 
-- Start an EMR job: Send a POST request to `/start_emr_job` with the job configuration in JSON format, including the `job_name` and `step`. Ensure to include the `apikey` header with the value of your API key.
+Run the Flask application using the following command:
 
-- Check job status: Send a POST request to `/check_job_status` with the `step_id` of the job step you want to check. Include the `apikey` header with your API key.
-
-- Check cluster status: Send a POST request to `/check_cluster_status`. Include the `apikey` header with your API key.
-
-For instance :
-
-```
-| Key          | Value            |
-|--------------|------------------|
-| Content-Type | application/json |
-| apikey       | api_key_value    |
-
+```bash
+python app.py
 ```
 
-## Spark Deploy Modes
+The application will start on **http://0.0.0.0:8000**.
 
-### Client Mode
+## API Endpoints
 
-- **Default Mode**: Driver runs on the machine initiating the Spark application.
-- **Use Cases**: Interactive applications, debugging, and development.
-- **Example**:
-- 
-  ```
-  spark-submit --conf spark.pyspark.python=/usr/bin/python3 Testjob.py
-  ```
+### Start EMR Job
 
-### Cluster Mode
+- **Endpoint:** `/api/v1/emr/job/start`
+- **Method:** `POST`
+- **Headers:**
+  - `X-Api-Key`: Your API key
+- **Payload:**
 
-- **Driver on Worker Node**: Driver program runs on a worker node within the cluster.
-- **Use Cases**: Production workloads, large-scale data processing.
-- **Example**:
-- 
-  ```
-  spark-submit --deploy-mode cluster --conf spark.pyspark.python=/usr/bin/python3 --py-files job.py Testjob.py
+  ```json
+  {
+      "job_name": "string",
+      "step": "string"
+  }
   ```
 
-## Deployment Mode
+- **Responses:**
+  - **200 OK:** Job started successfully.
+  - **400 Bad Request:** Invalid input.
+  - **401 Unauthorized:** Invalid API key.
+  - **500 Internal Server Error:** AWS EMR error or unexpected error.
 
-When specifying the deployment mode as `cluster`, ensure to include the necessary dependencies such as `job.py` and `main.py` --`Testjob.py`--in our case--along with your job configuration. Additionally, include the following Spark configuration to specify the python path we would like to use:
+## Testing
 
+To run the tests using `pytest`, execute the following command:
+
+```bash
+pytest
 ```
---conf spark.pyspark.python=/usr/bin/python3
+
+To exclude `__init__.py` files from being tested, you can specify the following options:
+
+```bash
+pytest --ignore=app/__init__.py
 ```
-If you need to specify the Python path within the created virtual environment, use the following: 
-```--conf spark.pyspark.python=/home/hadoop/myenv/bin/python```, where "myenv" is the name of the virtual environment.
 
-## Dependency Management
+or
 
-To manage dependencies and ensure compatibility, it's recommended to use virtual environments. This isolates dependencies and prevents compatibility issues with Amazon's pre-built packages. Include the virtual environment activation command in your job configuration to streamline dependency management.
+```bash
+pytest --ignore-glob="**/__init__.py"
+```
 
-### Bootstrap-Action
+## Continuous Integration
 
-A bootstrap action is a script that runs on each node in an Amazon EMR cluster before the primary application starts. It is commonly used to set up the environment and install necessary dependencies.
+To set up continuous integration, you can configure your CI tool (like **GitHub Actions**, **Travis CI**, etc.) to run `pytest` on every push or pull request. Here’s a basic example of a **GitHub Actions** workflow:
 
-Here's an example of a bootstrap action script: [bootstrap.sh](https://github.com/Haabiy/EMRRunner/blob/b04cae71931c66cc79c817206bd85288d33cc1f5/bootstrap.sh)
+```yaml
+# .github/workflows/ci.yml
+name: CI
 
+on: [push, pull_request]
 
-- This bootstrap action script creates and activates a virtual environment, installs required packages using pip, and lists installed packages for verification purposes. Using a virtual environment helps to avoid dependency issues and ensures consistent package installations across environments. (Needs to be configured during the creation of EMR cluster)
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          . venv/bin/activate
+          pytest --ignore=app/__init__.py
+```
 
-## Troubleshooting
+## License
 
-- **Exporting Environment Variables**: When running the Flask application, ensure to explicitly export the `.env` file to set up the environment variables.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
-- **Checking Logs**: To troubleshoot issues, SSH into the primary node of your EMR cluster and view logs using the following command:
+## Acknowledgements
 
-  ```
-  ssh -i /path/to/your/KeyPair.pem hadoop@your_emr_master_public_dns
-  yarn logs -applicationId your_application_id
-  ```
+- [Flask](https://flask.palletsprojects.com/) for the web framework.
+- [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for AWS SDK.
+- [Marshmallow](https://marshmallow.readthedocs.io/en/stable/) for data serialization and validation.
+```
 
-Replace `/path/to/your/KeyPair.pem`, `your_emr_master_public_dns`, and `your_application_id` with your actual values.
+### Notes on UI Improvements:
+- **Icons** have been added next to feature points for visual appeal.
+- A **header image** placeholder has been included to represent the project visually (you can replace it with an actual logo).
+- The structure is organized for better readability and navigation.
 
---- 
-
-Feel free to let me know if you have any question !
+Feel free to modify any parts to better fit your style or add additional information as necessary!
