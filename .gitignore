@@ -22,3 +22,6 @@ logs/
 
 #Pytest cache
 .pytest_cache
+
+# VENV
+venv
