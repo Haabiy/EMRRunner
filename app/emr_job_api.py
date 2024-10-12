@@ -30,7 +30,7 @@ API_SECRET = os.getenv('API_KEY_VALUE', 'test_api_key')
 emr_client = boto3.client('emr', 
                           aws_access_key_id=AWS_CONFIG['ACCESS_KEY'],
                           aws_secret_access_key=AWS_CONFIG['SECRET_KEY'],
-                          region_name=AWS_CONFIG['REGION'])
+                          region_name='eu-west-3')
 
 class JobRequestSchema(Schema):
     """Schema for validating job request data."""
