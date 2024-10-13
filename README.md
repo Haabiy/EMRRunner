@@ -19,6 +19,7 @@ The EMR Job Runner is a Flask-based application that interfaces with AWS EMR (El
 - [API Endpoints](#api-endpoints)
 - [Testing](#testing)
 - [Continuous Integration](#continuous-integration)
+- [Deployment](#deployment)
 
 ## Installation
 
@@ -227,6 +228,30 @@ jobs:
           pytest --ignore=app/__init__.py
 ```
 
-## License
+## Deployment
 
-See More: [LICENSE](LICENSE)
+When running Spark jobs on EMR through this application, you can deploy the job in **two modes**:
+
+1. **Client Mode** (default):
+   - In this mode, the Spark driver runs on the master node and submits tasks to worker nodes.
+   - The `spark-submit` command is executed as follows:
+   
+   ```bash
+   spark-submit --conf spark.pyspark.python=/home/hadoop/myenv/bin/python --py-files dependencies.py job.py
+   ```
+
+   - This is useful for small to medium jobs, where you want the driver logs to remain on the master node.
+
+2. **Cluster Mode**:
+   - In this mode, both the driver and tasks are distributed across the EMR cluster.
+   - The `spark-submit` command is executed in **cluster mode** as follows:
+
+   ```bash
+   spark-submit --deploy-mode cluster --conf spark.pyspark.python=/usr/bin/python3 --py-files dependencies.py job.py
+   ```
+
+   - This mode is ideal for larger jobs, as it allows for better distribution of resources and fault tolerance by leveraging the full EMR cluster.
+
+### How to Choose the Deployment Mode
+
+The mode you choose depends on the scale of the job and where you prefer the driver to run. In the `create_step_config` function in the code, you can switch between these modes based on the requirements.
