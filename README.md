@@ -19,7 +19,9 @@ The EMR Job Runner is a Flask-based application that interfaces with AWS EMR (El
 - [API Endpoints](#api-endpoints)
 - [Testing](#testing)
 - [Continuous Integration](#continuous-integration)
+- [Bootstrap Action](#bootstrap-action)
 - [Deployment](#deployment)
+
 
 ## Installation
 
@@ -188,8 +190,7 @@ To ensure the application works correctly in CI/CD pipelines, you need to set en
    - `S3_PATH`
    - `API_KEY_VALUE`
 
-These secrets will be securely accessed by the CI pipeline during execution;
-Here’s an example of a GitHub Actions workflow:
+These secrets will be securely accessed by the CI pipeline during execution. Here’s an example of a GitHub Actions workflow:
 
 ```yaml
 name: CI
@@ -228,6 +229,46 @@ jobs:
           pytest --ignore=app/__init__.py
 ```
 
+## Bootstrap Action
+
+A bootstrap action is used to set up the environment on the EMR cluster before any tasks are run. In this case, it creates and activates a virtual environment to avoid compatibility issues with Amazon's prebuilt libraries. The bootstrap action script (`bootstrap.sh`) is as follows:
+
+```bash
+#!/bin/bash -xe
+
+# Create and activate a virtual environment
+python3 -m venv /home/hadoop/venv
+source /home/hadoop/venv/bin/activate
+
+# Install pip for Python 3.x
+sudo yum install python3-pip -y
+sudo yum install -y python-psycopg2
+
+# Install required packages
+pip3 install \
+    boto3==1.26.53 \
+    pyspark==3.5.0 \
+    numpy==1.26.3 \
+    openpyxl==3.1.2 \
+    pandas==1.5.3 \
+    polars==0.20.5 \
+    psycopg2-binary==2.9.9 \
+    python-dotenv==1.0.0 \
+    s3fs==2023.4.0 \
+    SQLAlchemy==1.4.47 \
+    python-dateutil==2.8.2 \
+    connectorx==0.3.2 \
+    pyarrow==11.0.0 \
+    Unidecode==0.4.1 \
+    rapidfuzz==3.1.1
+
+deactivate
+```
+
+### Explanation
+- The script sets up a Python virtual environment in `/home/hadoop/venv`.
+- It installs necessary packages - (Include all libraries found in your `requirements.txt` file)
+
 ## Deployment
 
 When running Spark jobs on EMR through this application, you can deploy the job in **two modes**:
@@ -237,7 +278,7 @@ When running Spark jobs on EMR through this application, you can deploy the job 
    - The `spark-submit` command is executed as follows:
    
    ```bash
-   spark-submit --conf spark.pyspark.python=/home/hadoop/myenv/bin/python --py-files dependencies.py job.py
+   spark-submit --conf spark.pyspark.python=/home/hadoop/venv/bin/python --py-files dependencies.py job.py
    ```
 
    - This is useful for small to medium jobs, where you want the driver logs to remain on the master node.
