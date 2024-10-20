@@ -2,6 +2,9 @@
 
 ## Overview
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Amazon EMR](https://img.shields.io/badge/Amazon%20EMR-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
 The EMR Job Runner is a Flask-based application that interfaces with AWS EMR (Elastic MapReduce) to manage and execute Spark jobs. This application allows users to start EMR jobs by providing job names and steps, and it handles API key validation for security.
 
 ## Features
