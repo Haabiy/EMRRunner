@@ -1,7 +1,9 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from marshmallow import ValidationError
-from app.emr_job_api import app, create_step_config, JobRequestSchema, API_KEY_VALUE
+from app.emr_job_api import app, JobRequestSchema
+from app import config
+from app.emr_client import create_step_config
 
 @pytest.fixture
 def client():
@@ -36,13 +38,13 @@ def test_job_request_schema_invalid():
     with pytest.raises(ValidationError):
         schema.load(data)
 
-@patch('app.emr_job_api.emr_client')
+@patch('app.emr_client.emr_client')
 def test_start_emr_job_success(mock_emr_client, client):
     """Integration test for successful job start."""
     mock_emr_client.add_job_flow_steps.return_value = {'StepIds': ['s-123456']}
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": API_KEY_VALUE})
+                           headers={"X-Api-Key": config.API_KEY_VALUE})
     
     assert response.status_code == 200
     assert response.json['success'] == True
@@ -56,24 +58,24 @@ def test_start_emr_job_unauthorized(client):
     
     assert response.status_code == 401
 
-@patch('app.emr_job_api.emr_client')
+@patch('app.emr_client.emr_client')
 def test_start_emr_job_invalid_input(mock_emr_client, client):
     """Integration test for invalid input."""
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job"},  # Missing 'step'
-                           headers={"X-Api-Key": API_KEY_VALUE})
+                           headers={"X-Api-Key": config.API_KEY_VALUE})
     
     assert response.status_code == 400
     assert 'error' in response.json
 
-@patch('app.emr_job_api.emr_client')
+@patch('app.emr_client.emr_client')
 def test_start_emr_job_aws_error(mock_emr_client, client):
     """Integration test for AWS EMR error."""
     mock_emr_client.add_job_flow_steps.side_effect = Exception("AWS Error")
     
     response = client.post('/api/v1/emr/job/start', 
                            json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": API_KEY_VALUE})
+                           headers={"X-Api-Key": config.API_KEY_VALUE})
     
     assert response.status_code == 500
     assert 'error' in response.json
