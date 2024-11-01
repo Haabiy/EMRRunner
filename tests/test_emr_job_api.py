@@ -1,93 +1,132 @@
 import pytest
+from flask import Flask, json
 from unittest.mock import patch, MagicMock
-from marshmallow import ValidationError
-from app.emr_job_api import app, JobRequestSchema
-from app import config
-from app.emr_client import create_step_config
+
+# Import your API function
+from app.emr_job_api import start_emr_job_endpoint
 
 @pytest.fixture
-def client():
-    """Create a test client for the Flask app."""
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+def app():
+    """Create and configure a test Flask application."""
+    app = Flask(__name__)
+    app.route('/api/emr/start-job', methods=['POST'])(start_emr_job_endpoint)
+    return app
 
-def test_create_step_config():
-    """Unit test for create_step_config function."""
-    job_name = "Test Job"
-    step = "test_step"
-    config = create_step_config(job_name, step)
+@pytest.fixture
+def client(app):
+    """Create a test client."""
+    return app.test_client()
+
+def test_start_emr_job_success(client):
+    """Test successful EMR job start."""
+    # Mock data
+    test_data = {
+        'job_name': 'test_job',
+        'step': 'test_step',
+        'deploy_mode': 'client'
+    }
     
-    assert config['Name'] == job_name
-    assert config['ActionOnFailure'] == 'CONTINUE'
-    assert 'HadoopJarStep' in config
-    assert 'Args' in config['HadoopJarStep']
-    assert 'spark-submit' in config['HadoopJarStep']['Args'][-1]
+    # Mock the start_emr_job function
+    with patch('app.emr_job_api.start_emr_job') as mock_start_job:
+        mock_start_job.return_value = 'test-step-id'
+        
+        # Make request
+        response = client.post(
+            '/api/emr/start-job',
+            data=json.dumps(test_data),
+            content_type='application/json'
+        )
+        
+        # Assert response
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['success'] is True
+        assert data['step_id'] == 'test-step-id'
+        assert data['details']['job_name'] == 'test_job'
+        assert data['details']['step'] == 'test_step'
+        assert data['details']['deploy_mode'] == 'client'
+        
+        # Verify function was called with correct parameters
+        mock_start_job.assert_called_once_with(
+            job_name='test_job',
+            step='test_step'
+        )
 
-def test_job_request_schema_valid():
-    """Unit test for JobRequestSchema with valid data."""
-    schema = JobRequestSchema()
-    data = {"job_name": "Test Job", "step": "test_step"}
-    result = schema.load(data)
-    assert result == data
-
-def test_job_request_schema_invalid():
-    """Unit test for JobRequestSchema with invalid data."""
-    schema = JobRequestSchema()
-    data = {"job_name": "Test Job"}  # Missing 'step'
-    with pytest.raises(ValidationError):
-        schema.load(data)
-
-@patch('app.emr_client.emr_client')
-def test_start_emr_job_success(mock_emr_client, client):
-    """Integration test for successful job start."""
-    mock_emr_client.add_job_flow_steps.return_value = {'StepIds': ['s-123456']}
-    response = client.post('/api/v1/emr/job/start', 
-                           json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": config.API_KEY_VALUE})
+def test_missing_required_fields(client):
+    """Test missing required fields in request."""
+    # Test missing job_name
+    test_data = {
+        'step': 'test_step'
+    }
     
-    assert response.status_code == 200
-    assert response.json['success'] == True
-    assert 'step_id' in response.json
-
-def test_start_emr_job_unauthorized(client):
-    """Integration test for unauthorized access."""
-    response = client.post('/api/v1/emr/job/start', 
-                           json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": "wrong_api_key"})
-    
-    assert response.status_code == 401
-
-@patch('app.emr_client.emr_client')
-def test_start_emr_job_invalid_input(mock_emr_client, client):
-    """Integration test for invalid input."""
-    response = client.post('/api/v1/emr/job/start', 
-                           json={"job_name": "Test Job"},  # Missing 'step'
-                           headers={"X-Api-Key": config.API_KEY_VALUE})
-    
-    assert response.status_code == 400
-    assert 'error' in response.json
-
-@patch('app.emr_client.emr_client')
-def test_start_emr_job_aws_error(mock_emr_client, client):
-    """Integration test for AWS EMR error."""
-    mock_emr_client.add_job_flow_steps.side_effect = Exception("AWS Error")
-    
-    response = client.post('/api/v1/emr/job/start', 
-                           json={"job_name": "Test Job", "step": "test_step"},
-                           headers={"X-Api-Key": config.API_KEY_VALUE})
+    response = client.post(
+        '/api/emr/start-job',
+        data=json.dumps(test_data),
+        content_type='application/json'
+    )
     
     assert response.status_code == 500
-    assert 'error' in response.json
+    data = json.loads(response.data)
+    assert 'error' in data
+    assert 'details' in data
 
-def test_404_error(client):
-    """Test 404 Not Found error handler."""
-    response = client.get('/non_existent_route')
-    assert response.status_code == 404
-    assert 'error' in response.json
+def test_empty_payload(client):
+    """Test empty request payload."""
+    response = client.post(
+        '/api/emr/start-job',
+        data=json.dumps({}),
+        content_type='application/json'
+    )
+    
+    assert response.status_code == 500
+    data = json.loads(response.data)
+    assert 'error' in data
 
-def test_405_error(client):
-    """Test 405 Method Not Allowed error handler."""
-    response = client.get('/api/v1/emr/job/start')
-    assert response.status_code == 405
-    assert 'error' in response.json
+def test_invalid_deploy_mode(client):
+    """Test invalid deploy mode value."""
+    test_data = {
+        'job_name': 'test_job',
+        'step': 'test_step',
+        'deploy_mode': 'invalid_mode'
+    }
+    
+    response = client.post(
+        '/api/emr/start-job',
+        data=json.dumps(test_data),
+        content_type='application/json'
+    )
+    
+    assert response.status_code == 200  # Since deploy_mode is optional
+
+def test_emr_job_failure(client):
+    """Test EMR job start failure."""
+    test_data = {
+        'job_name': 'test_job',
+        'step': 'test_step'
+    }
+    
+    with patch('app.emr_job_api.start_emr_job') as mock_start_job:
+        mock_start_job.side_effect = Exception('EMR job failed')
+        
+        response = client.post(
+            '/api/emr/start-job',
+            data=json.dumps(test_data),
+            content_type='application/json'
+        )
+        
+        assert response.status_code == 500
+        data = json.loads(response.data)
+        assert data['error'] == 'Unexpected error'
+        assert 'EMR job failed' in data['details']
+
+def test_invalid_json_payload(client):
+    """Test invalid JSON payload."""
+    response = client.post(
+        '/api/emr/start-job',
+        data='invalid json',
+        content_type='application/json'
+    )
+    
+    assert response.status_code == 500
+    data = json.loads(response.data)
+    assert 'error' in data

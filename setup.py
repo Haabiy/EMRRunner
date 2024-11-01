@@ -5,7 +5,7 @@ with open("README.md", "r") as README:
 
 setup(
     name='emrrunner',
-    version='v1.0.5',
+    version='v1.0.0',
     packages=['app'],
     include_package_data=True,
     install_requires=[
