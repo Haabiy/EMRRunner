@@ -1,5 +1,7 @@
+# app/test_api.py
 from flask import Flask, request, jsonify
 from app.emr_client import start_emr_job
+
 
 app = Flask(__name__)
 
@@ -17,10 +19,10 @@ def start_emr_job_endpoint():
     """
     try:
         data = request.json
-        deploy_mode = data.get('deploy_mode', 'client')
         step_id = start_emr_job(
             job_name=data['job_name'],
-            step=data['step']
+            step=data['step'],
+            deploy_mode=data.get('deploy_mode', 'client'),
         )
         
         return jsonify({
@@ -29,12 +31,12 @@ def start_emr_job_endpoint():
             'details': {
                 'job_name': data['job_name'],
                 'step': data['step'],
-                'deploy_mode': deploy_mode
+                'deploy_mode': data.get('deploy_mode', 'client')
             }
         })
     except Exception as e:
         return jsonify({'error': 'Unexpected error', 'details': str(e)}), 500
-
+    
 @app.errorhandler(400)
 def bad_request(error):
     """Handle 400 Bad Request errors."""
@@ -51,4 +53,4 @@ def method_not_allowed(error):
     return jsonify({'error': 'Method Not Allowed', 'details': 'The method is not allowed for the requested URL.'}), 405
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8001, debug=True)

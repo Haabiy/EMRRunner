@@ -1,4 +1,3 @@
-# my_emr_package/config.py
 import os
 from dotenv import load_dotenv
 
