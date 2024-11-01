@@ -1,13 +1,11 @@
+# app/test_api.py
 from flask import Flask, request, jsonify
-from app.decorators import require_api_key, validate_request
-from app.schema import JobRequestSchema
 from app.emr_client import start_emr_job
 
 
 app = Flask(__name__)
 
 @app.route('/api/v1/emr/job/start', methods=['POST'])
-@require_api_key
 def start_emr_job_endpoint():
     """
     Start a new EMR job.
@@ -20,11 +18,11 @@ def start_emr_job_endpoint():
     }
     """
     try:
-        data = request.validated_data
+        data = request.json
         step_id = start_emr_job(
             job_name=data['job_name'],
             step=data['step'],
-            deploy_mode=data.get('deploy_mode', 'client')
+            deploy_mode=data.get('deploy_mode', 'client'),
         )
         
         return jsonify({
@@ -38,7 +36,7 @@ def start_emr_job_endpoint():
         })
     except Exception as e:
         return jsonify({'error': 'Unexpected error', 'details': str(e)}), 500
-
+    
 @app.errorhandler(400)
 def bad_request(error):
     """Handle 400 Bad Request errors."""
@@ -53,3 +51,6 @@ def not_found(error):
 def method_not_allowed(error):
     """Handle 405 Method Not Allowed errors."""
     return jsonify({'error': 'Method Not Allowed', 'details': 'The method is not allowed for the requested URL.'}), 405
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8001, debug=True)

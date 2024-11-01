@@ -1,18 +1,28 @@
+# app/decorators.py
 from functools import wraps
 from flask import request, jsonify
 from marshmallow import ValidationError
 from app import config 
 
-def validate_request(schema):
-    """Decorator to validate request data against a schema."""
+def validate_request(schema_class):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            if not request.is_json:
+                return jsonify({"error": "Invalid input", "details": "Request must be JSON"}), 400
+            
+            schema = schema_class()
+            json_data = request.get_json()
+            print(f"Received data: {json_data}")  # Debug print
+            
             try:
-                schema().load(request.json)
+                validated_data = schema.load(json_data)
+                print(f"Validated data: {validated_data}")  # Debug print
+                request.validated_data = validated_data
+                return f(*args, **kwargs)
             except ValidationError as err:
+                print(f"Validation error: {err.messages}")  # Debug print
                 return jsonify({"error": "Invalid input", "details": err.messages}), 400
-            return f(*args, **kwargs)
         return decorated_function
     return decorator
 

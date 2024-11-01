@@ -1,18 +1,25 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as README:
+    description = README.read()
+
 setup(
-    name='app',
-    version='v1.0.2',
-    packages=find_packages(),
+    name='emrrunner',
+    version='v1.0.5',
+    packages=['app'],
+    include_package_data=True,
     install_requires=[
         'Flask',
         'boto3',
         'python-dotenv',
         'marshmallow',
+        'argparse',
     ],
     entry_points={
         'console_scripts': [
-            'run-my-emr-api=app.emr_job_api:run_app',
+            'emrrunner=app.cli:cli_main',
         ],
     },
+    long_description=description,
+    long_description_content_type="text/markdown"
 )
