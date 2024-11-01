@@ -4,16 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "emrrunner"
-version = "1.0.5"
+version = "1.0.6"
 description = "A powerful command-line tool and API for managing Spark jobs on Amazon EMR clusters"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE.md" }
 authors = [
-    { name = "Haabiy", email = "haabiy@gmail.com" }
+    { name = "Haabiy", email = "abiy.dema@gmail.com" }
 ]
 maintainers = [
-    { name = "Haabiy", email = "haabiy@gmail.com" }
+    { name = "Haabiy", email = "abiy.dema@gmail.com" }
 ]
 keywords = ["emr", "aws", "spark", "data-engineering", "cli", "emr-runner", "spark-jobs"]
 classifiers = [

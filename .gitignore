@@ -25,3 +25,4 @@ logs/
 
 # VENV
 venv
+emrrunner.egg-info
