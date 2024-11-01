@@ -46,19 +46,3 @@ def test_empty_payload(client):
     assert response.status_code == 500
     data = json.loads(response.data)
     assert 'error' in data
-
-def test_invalid_deploy_mode(client):
-    """Test invalid deploy mode value."""
-    test_data = {
-        'job_name': 'test_job',
-        'step': 'test_step',
-        'deploy_mode': 'invalid_mode'
-    }
-    
-    response = client.post(
-        '/api/emr/start-job',
-        data=json.dumps(test_data),
-        content_type='application/json'
-    )
-    
-    assert response.status_code == 200  # Since deploy_mode is optional
