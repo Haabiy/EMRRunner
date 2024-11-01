@@ -1,4 +1,4 @@
-# SparkEMR Commander
+# EMRRunner : EMR Job Runner
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 ![Amazon EMR](https://img.shields.io/badge/Amazon%20EMR-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -26,10 +26,16 @@ A powerful command-line tool and API for managing and deploying Spark jobs on Am
 
 ## 🛠️ Installation
 
+### From PyPI
+```bash
+pip install emrrunner
+```
+
+### From Source
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/SparkEMRCommander.git
-cd SparkEMRCommander
+git clone https://github.com/yourusername/EMRRunner.git
+cd EMRRunner
 
 # Create and activate virtual environment
 python -m venv venv
@@ -44,6 +50,7 @@ pip install -e .
 ### AWS Configuration
 Create a `.env` file in the project root with your AWS configuration:
 
+`Note: Export these variables in your terminal before running:`
 ```env
 AWS_ACCESS_KEY=your_access_key
 AWS_SECRET_KEY=your_secret_key
@@ -75,49 +82,130 @@ deactivate
 
 Upload the bootstrap script to S3 and reference it in your EMR cluster configuration.
 
+## 📁 Project Structure
+
+```
+EMRRunner/
+├── Dockerfile
+├── LICENSE.md
+├── README.md
+├── app/
+│   ├── __init__.py
+│   ├── cli.py              # Command-line interface
+│   ├── config.py           # Configuration management
+│   ├── emr_client.py       # EMR interaction logic
+│   ├── emr_job_api.py      # Flask API endpoints
+│   ├── run_api.py          # API server runner
+│   └── schema.py           # Request/Response schemas
+├── bootstrap/
+│   └── bootstrap.sh        # EMR bootstrap script
+├── tests/
+│   ├── __init__.py
+│   ├── test_config.py
+│   ├── test_emr_job_api.py
+│   └── test_schema.py
+├── pyproject.toml
+├── requirements.txt
+└── setup.py
+```
+
+## 📦 S3 Job Structure
+
+The `S3_PATH` in your configuration should point to a bucket with the following structure:
+
+```
+s3://your-bucket/
+├── jobs/
+│   ├── job1/
+│   │   ├── dependencies.py   # Shared functions and utilities
+│   │   └── job.py           # Main job execution script
+│   └── job2/
+│       ├── dependencies.py
+│       └── job.py
+└── common/
+    └── shared_utils.py      # Cross-job shared utilities
+```
+
+### Job Organization
+
+Each job in the S3 bucket follows a standard structure:
+
+1. **dependencies.py**
+   - Contains reusable functions and utilities specific to the job
+   - Example functions:
+     ```python
+     def process_data(df):
+         # Data processing logic
+         pass
+
+     def validate_input(data):
+         # Input validation logic
+         pass
+
+     def transform_output(result):
+         # Output transformation logic
+         pass
+     ```
+
+2. **job.py**
+   - Main execution script that uses functions from dependencies.py
+   - Standard structure:
+     ```python
+     from dependencies import process_data, validate_input, transform_output
+
+     def main():
+         # 1. Read input data
+         input_data = spark.read.parquet("s3://input-path")
+         
+         # 2. Validate input
+         validate_input(input_data)
+         
+         # 3. Process data
+         processed_data = process_data(input_data)
+         
+         # 4. Transform output
+         final_output = transform_output(processed_data)
+         
+         # 5. Write results
+         final_output.write.parquet("s3://output-path")
+
+     if __name__ == "__main__":
+         main()
+     ```
+
 ## 💻 Usage
 
 ### Command Line Interface
 
 Start a job in client mode:
 ```bash
-emrrunner start --job job_name --step step_name
+emrrunner start --job job1 --step process_daily_data
 ```
 
 Start a job in cluster mode:
 ```bash
-emrrunner start --job job_name --step step_name --deploy-mode cluster
+emrrunner start --job job1 --step process_daily_data --deploy-mode cluster
 ```
 
 ### API Endpoints
 
-Start a job via API:
+Start a job via API in client mode (default):
 ```bash
-curl -X POST http://localhost:8000/api/v1/emr/job/start \
+curl -X POST http://localhost:8000/api/emr/start-job \
      -H "Content-Type: application/json" \
-     -H "X-API-Key: your_api_key" \
-     -d '{"job_name": "example_job", "step": "example_step"}'
+     -d '{"job_name": "job1", "step": "process_daily_data"}'
 ```
 
-## 📁 Project Structure
-
-```
-SparkEMRCommander/
-├── app/
-│   ├── __init__.py
-│   ├── cli.py              # Command-line interface
-│   ├── emr_client.py       # EMR interaction logic
-│   ├── emr_job_api.py      # Flask API
-│   └── config.py           # Configuration management
-├── bootstrap/
-│   └── bootstrap.sh        # EMR bootstrap script
-├── requirements.txt
-└── setup.py
+Start a job via API in cluster mode:
+```bash
+curl -X POST http://localhost:8000/api/emr/start-job \
+     -H "Content-Type: application/json" \
+     -d '{"job_name": "job1", "step": "process_daily_data", "deploy_mode": "cluster"}'
 ```
 
 ## 🔧 Development
 
-To contribute to SparkEMR Commander:
+To contribute to EMRRunner:
 
 1. Fork the repository
 2. Create a feature branch
@@ -139,9 +227,14 @@ To contribute to SparkEMR Commander:
    - Document system-level dependencies
    - Test dependencies in a clean environment
 
+3. **Job Organization**
+   - Follow the standard structure for jobs
+   - Keep dependencies.py focused and modular
+   - Use clear naming conventions
+   - Document all functions and modules
+
 ## 🔒 Security
 
-- Uses API key authentication for endpoints
 - Supports AWS credential management
 - Validates all input parameters
 - Secure handling of bootstrap scripts
@@ -160,12 +253,6 @@ If you discover any bugs, please create an issue on GitHub with:
 - Your operating system name and version
 - Any details about your local setup that might be helpful in troubleshooting
 - Detailed steps to reproduce the bug
-
-## ✨ Acknowledgements
-
-- AWS EMR Team
-- Flask Framework
-- Python Community
 
 ---
 
