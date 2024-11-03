@@ -1,4 +1,4 @@
-# EMRRunner : EMR Job Runner
+# EMRRunner (EMR Job Runner)
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 ![Amazon EMR](https://img.shields.io/badge/Amazon%20EMR-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
@@ -189,14 +189,14 @@ emrrunner start --job job1 --step process_daily_data --deploy-mode cluster
 
 Start a job via API in client mode (default):
 ```bash
-curl -X POST http://localhost:8000/api/emr/start-job \
+curl -X POST http://localhost:8000/api/v1/emr/job/start \
      -H "Content-Type: application/json" \
      -d '{"job_name": "job1", "step": "process_daily_data"}'
 ```
 
 Start a job via API in cluster mode:
 ```bash
-curl -X POST http://localhost:8000/api/emr/start-job \
+curl -X POST http://localhost:8000/api/v1/emr/job/start \
      -H "Content-Type: application/json" \
      -d '{"job_name": "job1", "step": "process_daily_data", "deploy_mode": "cluster"}'
 ```
