@@ -16,8 +16,7 @@ def cli_main():
         args = parser.parse_args()
         
         if args.command == 'start':
-            # For now, just pass the required arguments
-            result = start_emr_job(args.job, args.step)
+            result = start_emr_job(args.job, args.step, args.deploy_mode)
             print(result)
             return 0
         return 1

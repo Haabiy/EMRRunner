@@ -52,11 +52,11 @@ Create a `.env` file in the project root with your AWS configuration:
 
 `Note: Export these variables in your terminal before running:`
 ```env
-AWS_ACCESS_KEY=your_access_key
-AWS_SECRET_KEY=your_secret_key
-AWS_REGION=your_region
-EMR_CLUSTER_ID=your_cluster_id
-S3_PATH=s3://your-bucket/path
+export AWS_ACCESS_KEY=your_access_key
+export AWS_SECRET_KEY=your_secret_key
+export AWS_REGION=your_region
+export EMR_CLUSTER_ID=your_cluster_id
+export S3_PATH=s3://your-bucket/path
 ```
 
 ### Bootstrap Actions
@@ -122,8 +122,6 @@ s3://your-bucket/
 │   └── job2/
 │       ├── dependencies.py
 │       └── job.py
-└── common/
-    └── shared_utils.py      # Cross-job shared utilities
 ```
 
 ### Job Organization
