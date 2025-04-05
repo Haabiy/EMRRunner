@@ -5,7 +5,7 @@ with open("README.md", "r") as README:
 
 setup(
     name='emrrunner',
-    version='v1.0.10',
+    version='1.0.10',
     author='Haabiy',
     author_email='abiy.dema@gmail.com',  
     description='A powerful CLI tool and API for managing Spark jobs on Amazon EMR clusters',
