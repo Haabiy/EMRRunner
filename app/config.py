@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from a .env file or export them on your terminal
+load_dotenv()
 
 AWS_CONFIG = {
     'ACCESS_KEY': os.getenv('AWS_ACCESS_KEY_ID'),
