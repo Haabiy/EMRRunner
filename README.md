@@ -5,7 +5,7 @@
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
-A powerful command-line tool and API for managing and deploying Spark jobs on Amazon EMR clusters. EMRRunner simplifies the submission and management of Python-based (e.g., PySpark) data pipeline jobs.
+A powerful command-line tool for managing and deploying Spark jobs on Amazon EMR clusters. EMRRunner simplifies the submission and management of Python-based (e.g., PySpark) data pipeline jobs.
 
 ## 🚀 Features
 
