@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "emrrunner"
 version = "1.0.10"
-description = "A powerful command-line tool and API for managing Spark jobs on Amazon EMR clusters"
+description = "A powerful command-line tool for managing and deploying Python-based (e.g., PySpark) data pipeline jobs on Amazon EMR clusters."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE.md" }
