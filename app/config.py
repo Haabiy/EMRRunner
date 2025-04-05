@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from a .env file
+load_dotenv()  # Load environment variables from a .env file or export them on your terminal
 
 AWS_CONFIG = {
     'ACCESS_KEY': os.getenv('AWS_ACCESS_KEY_ID'),
@@ -11,8 +11,5 @@ AWS_CONFIG = {
 
 EMR_CONFIG = {
     'CLUSTER_ID': os.getenv('EMR_CLUSTER_ID'),
-    'S3_BUCKET': os.getenv('BUCKET_NAME'),
     'S3_PATH': os.getenv('S3_PATH')
 }
-
-API_KEY_VALUE = os.getenv('API_KEY_VALUE')

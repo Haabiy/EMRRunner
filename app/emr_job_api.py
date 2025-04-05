@@ -3,15 +3,14 @@ from app.emr_client import start_emr_job
 
 app = Flask(__name__)
 
-@app.route('/api/v1/emr/job/start', methods=['POST'])
+@app.route('/emrrunner/start', methods=['POST'])
 def start_emr_job_endpoint():
     """
     Start a new EMR job.
     
     Expected JSON payload:
     {
-        "job_name": "string",
-        "step": "string",
+        "job": "string",
         "deploy_mode": "client|cluster"  # Optional, defaults to "client"
     }
     """
@@ -19,16 +18,14 @@ def start_emr_job_endpoint():
         data = request.json
         deploy_mode = data.get('deploy_mode', 'client')
         step_id = start_emr_job(
-            job_name=data['job_name'],
-            step=data['step']
+            job=data['job']
         )
         
         return jsonify({
             'success': True,
             'step_id': step_id,
             'details': {
-                'job_name': data['job_name'],
-                'step': data['step'],
+                'job': data['job'],
                 'deploy_mode': deploy_mode
             }
         })
