@@ -78,7 +78,7 @@ Now, you won’t have to export the variables manually in each session, and they
 
 
 ### Bootstrap Actions
-For EMR cluster setup with required dependencies, create a bootstrap script (e.g.: `bootstrap.sh`):
+For EMR cluster setup with required dependencies, create a bootstrap script (e.g.: `bootstrap.sh`);
 
 ```bash
 #!/bin/bash -xe
