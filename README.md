@@ -44,7 +44,7 @@ pip install -e .
 
 ### AWS Configuration
 
-Create a `.env` file in the project root with your AWS configuration or export these variables in your terminal before running:`
+Create a `.env` file in the project root with your AWS configuration or export these variables in your terminal before running:
 ```Bash
 export AWS_ACCESS_KEY_ID="your_access_key"
 export AWS_SECRET_ACCESS_KEY="your_secret_key"
@@ -53,7 +53,7 @@ export EMR_CLUSTER_ID="your_cluster_id"
 export S3_PATH="s3://your-bucket/path" # The path to your jobs (the directory containing your job_package.zip file)...see `S3 Job Structure` below
 ```
 
-or instead of exporting these variables in each terminal session, you can add them permanently to your terminal by editing your `~/.zshrc` file:
+or a better approach — instead of exporting these variables in each terminal session, you can add them permanently to your terminal by editing your `~/.zshrc` file:
 1. Open your `~/.zshrc` file:
    ```bash
    nano ~/.zshrc
