@@ -8,7 +8,6 @@ def cli_main():
     # Add arguments
     parser.add_argument('command', choices=['start'], help='Command to execute')
     parser.add_argument('--job', required=True, help='Job name')
-    parser.add_argument('--step', required=True, help='Step name')
     parser.add_argument('--deploy-mode', choices=['client', 'cluster'], 
                        default='client', help='Spark deploy mode: client or cluster')
 
@@ -16,7 +15,7 @@ def cli_main():
         args = parser.parse_args()
         
         if args.command == 'start':
-            result = start_emr_job(args.job, args.step, args.deploy_mode)
+            result = start_emr_job(args.job, args.deploy_mode)
             print(result)
             return 0
         return 1

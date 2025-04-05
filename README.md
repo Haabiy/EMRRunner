@@ -1,21 +1,17 @@
-# EMRRunner (EMR Job Runner)
+# EMRRunner
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 ![Amazon EMR](https://img.shields.io/badge/Amazon%20EMR-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
-A powerful command-line tool and API for managing and deploying Spark jobs on Amazon EMR clusters. EMRRunner simplifies the process of submitting and managing Spark jobs while handling all the necessary environment setup.
+A powerful command-line tool for managing and deploying Spark jobs on Amazon EMR clusters. EMRRunner simplifies the submission and management of Python-based (e.g., PySpark) data pipeline jobs.
 
 ## 🚀 Features
 
 - Command-line interface for quick job submission
-- RESTful API for programmatic access
+- Basic POST API for fast job submission
 - Support for both client and cluster deploy modes
-- Automatic S3 synchronization of job files
-- Configurable job parameters
-- Easy dependency management
-- Bootstrap action support for cluster setup
 
 ## 📋 Prerequisites
 
@@ -34,12 +30,11 @@ pip install emrrunner
 ### From Source
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/EMRRunner.git
-cd EMRRunner
+git clone https://github.com/Haabiy/EMRRunner.git && cd EMRRunner
 
 # Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+source venv/bin/activate
 
 # Install the package
 pip install -e .
@@ -48,19 +43,42 @@ pip install -e .
 ## ⚙️ Configuration
 
 ### AWS Configuration
-Create a `.env` file in the project root with your AWS configuration:
 
-`Note: Export these variables in your terminal before running:`
-```env
-export AWS_ACCESS_KEY=your_access_key
-export AWS_SECRET_KEY=your_secret_key
-export AWS_REGION=your_region
-export EMR_CLUSTER_ID=your_cluster_id
-export S3_PATH=s3://your-bucket/path
+Create a `.env` file in the project root with your AWS configuration or export these variables in your terminal before running:`
+```Bash
+export AWS_ACCESS_KEY_ID="your_access_key"
+export AWS_SECRET_ACCESS_KEY="your_secret_key"
+export AWS_REGION="your_region"
+export EMR_CLUSTER_ID="your_cluster_id"
+export S3_PATH="s3://your-bucket/path" # The path to your jobs (the directory containing your job_package.zip file)...see `S3 Job Structure` below
 ```
 
+or instead of exporting these variables in each terminal session, you can add them permanently to your terminal by editing your `~/.zshrc` file:
+1. Open your `~/.zshrc` file:
+   ```bash
+   nano ~/.zshrc
+   ```
+2. Add the following lines at the end of the file (replace with your own AWS credentials):
+   ```bash
+   export AWS_ACCESS_KEY_ID="your_access_key"
+   export AWS_SECRET_ACCESS_KEY="your_secret_key"
+   export AWS_REGION="your_region"
+   export EMR_CLUSTER_ID="your_cluster_id"
+   export S3_PATH="s3://your-bucket/path"
+   ```
+3. Save and exit the file (`Ctrl + X`).
+4. To apply the changes immediately, run:
+   ```bash
+   source ~/.zshrc
+   ```
+
+Now, you won’t have to export the variables manually in each session, and they’ll be available whenever you open a new terminal session.
+
+--- 
+
+
 ### Bootstrap Actions
-For EMR cluster setup with required dependencies, create a bootstrap script (`bootstrap.sh`):
+For EMR cluster setup with required dependencies, create a bootstrap script (e.g.: `bootstrap.sh`):
 
 ```bash
 #!/bin/bash -xe
@@ -76,6 +94,24 @@ sudo yum install -y [your-system-packages]
 
 # Install Python packages
 pip3 install [your-required-packages]
+
+deactivate
+```
+
+E.g
+```bash
+#!/bin/bash -xe
+
+# Create and activate a virtual environment
+python3 -m venv /home/hadoop/myenv
+source /home/hadoop/myenv/bin/activate
+
+# Install pip for Python 3.x
+sudo yum install python3-pip -y
+
+# Install required packages
+pip3 install \
+    pyspark==3.5.5 \
 
 deactivate
 ```
@@ -117,59 +153,34 @@ The `S3_PATH` in your configuration should point to a bucket with the following 
 s3://your-bucket/
 ├── jobs/
 │   ├── job1/
-│   │   ├── dependencies.py   # Shared functions and utilities
-│   │   └── job.py           # Main job execution script
+│   │   ├── job_package.zip  # Include shared functions and utilities, make sure your main script is named `main.py`, and name your zip file `job_package.zip`.
 │   └── job2/
-│       ├── dependencies.py
-│       └── job.py
+│   │   ├── job_package.zip  # Include shared functions and utilities, make sure your main script is named `main.py`, and name your zip file `job_package.zip`.
 ```
 
-### Job Organization
+### Job Script (`main.py`)
 
-Each job in the S3 bucket follows a standard structure:
+Your job script should include the necessary logic for executing the tasks in your data pipeline, using functions from your dependencies.
 
-1. **dependencies.py**
-   - Contains reusable functions and utilities specific to the job
-   - Example functions:
-     ```python
-     def process_data(df):
-         # Data processing logic
-         pass
+Example of `main.py`:
 
-     def validate_input(data):
-         # Input validation logic
-         pass
+```python
+from dependencies import clean, transform, sink  # Import your core job functions
 
-     def transform_output(result):
-         # Output transformation logic
-         pass
-     ```
+def main():
+    # Step 1: Clean the data
+    clean()
 
-2. **job.py**
-   - Main execution script that uses functions from dependencies.py
-   - Standard structure:
-     ```python
-     from dependencies import process_data, validate_input, transform_output
+    # Step 2: Transform the data
+    transform()
 
-     def main():
-         # 1. Read input data
-         input_data = spark.read.parquet("s3://input-path")
-         
-         # 2. Validate input
-         validate_input(input_data)
-         
-         # 3. Process data
-         processed_data = process_data(input_data)
-         
-         # 4. Transform output
-         final_output = transform_output(processed_data)
-         
-         # 5. Write results
-         final_output.write.parquet("s3://output-path")
+    # Step 3: Sink (store) the processed data
+    sink()
 
-     if __name__ == "__main__":
-         main()
-     ```
+if __name__ == "__main__":
+    main()  # Execute the main function when the script is run
+```
+
 
 ## 💻 Usage
 
@@ -177,28 +188,28 @@ Each job in the S3 bucket follows a standard structure:
 
 Start a job in client mode:
 ```bash
-emrrunner start --job job1 --step process_daily_data
+emrrunner start --job job1
 ```
 
 Start a job in cluster mode:
 ```bash
-emrrunner start --job job1 --step process_daily_data --deploy-mode cluster
+emrrunner start --job job1 --deploy-mode cluster
 ```
 
 ### API Endpoints
 
 Start a job via API in client mode (default):
 ```bash
-curl -X POST http://localhost:8000/api/v1/emr/job/start \
+curl -X POST http://localhost:8000/emrrunner/start \
      -H "Content-Type: application/json" \
-     -d '{"job_name": "job1", "step": "process_daily_data"}'
+     -d '{"job": "job1"}'
 ```
 
 Start a job via API in cluster mode:
 ```bash
-curl -X POST http://localhost:8000/api/v1/emr/job/start \
+curl -X POST http://localhost:8000/emrrunner/start \
      -H "Content-Type: application/json" \
-     -d '{"job_name": "job1", "step": "process_daily_data", "deploy_mode": "cluster"}'
+     -d '{"job": "job1", "deploy_mode": "cluster"}'
 ```
 
 ## 🔧 Development
@@ -221,21 +232,13 @@ To contribute to EMRRunner:
 
 2. **Job Dependencies**
    - Maintain a requirements.txt for each job
-   - Use virtual environments
    - Document system-level dependencies
    - Test dependencies in a clean environment
 
 3. **Job Organization**
    - Follow the standard structure for jobs
-   - Keep dependencies.py focused and modular
    - Use clear naming conventions
    - Document all functions and modules
-
-## 🔒 Security
-
-- Supports AWS credential management
-- Validates all input parameters
-- Secure handling of bootstrap scripts
 
 ## 📝 License
 
@@ -248,7 +251,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 🐛 Bug Reports
 
 If you discover any bugs, please create an issue on GitHub with:
-- Your operating system name and version
 - Any details about your local setup that might be helpful in troubleshooting
 - Detailed steps to reproduce the bug
 
