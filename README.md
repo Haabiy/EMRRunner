@@ -34,7 +34,7 @@ git clone https://github.com/Haabiy/EMRRunner.git && cd EMRRunner
 
 # Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+source venv/bin/activate
 
 # Install the package
 pip install -e .
@@ -45,12 +45,12 @@ pip install -e .
 ### AWS Configuration
 
 Create a `.env` file in the project root with your AWS configuration or export these variables in your terminal before running:`
-```env
-export AWS_ACCESS_KEY_ID=your_access_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
-export AWS_REGION=your_region
-export EMR_CLUSTER_ID=your_cluster_id
-export S3_PATH=s3://your-bucket/path # The path to your jobs (the directory containing your job_package.zip file)... see `S3 Job Structure` below
+```Bash
+export AWS_ACCESS_KEY_ID="your_access_key"
+export AWS_SECRET_ACCESS_KEY="your_secret_key"
+export AWS_REGION="your_region"
+export EMR_CLUSTER_ID="your_cluster_id"
+export S3_PATH="s3://your-bucket/path" # The path to your jobs (the directory containing your job_package.zip file)...see `S3 Job Structure` below
 ```
 
 or instead of exporting these variables in each terminal session, you can add them permanently to your terminal by editing your `~/.zshrc` file:
@@ -66,7 +66,7 @@ or instead of exporting these variables in each terminal session, you can add th
    export EMR_CLUSTER_ID="your_cluster_id"
    export S3_PATH="s3://your-bucket/path"
    ```
-3. Save and exit the file (`Ctrl + X`, then `Y` to confirm and `Enter`).
+3. Save and exit the file (`Ctrl + X`).
 4. To apply the changes immediately, run:
    ```bash
    source ~/.zshrc
@@ -158,20 +158,29 @@ s3://your-bucket/
 │   │   ├── job_package.zip  # Include shared functions and utilities, make sure your main script is named `main.py`, and name your zip file `job_package.zip`.
 ```
 
-### Job Organization
+### Job Script (`main.py`)
 
-1. **main.py**
-   - Main execution script that uses functions from your dependencies.
+Your job script should include the necessary logic for executing the tasks in your data pipeline, using functions from your dependencies.
 
-E.g:
-     ```python
-     from dependencies import clean, transform, sink  # import your different dependencies
+Example of `main.py`:
 
-     if __name__ == "__main__":
-         clean()
-         transform()
-         sink()
-     ```
+```python
+from dependencies import clean, transform, sink  # Import your core job functions
+
+def main():
+    # Step 1: Clean the data
+    clean()
+
+    # Step 2: Transform the data
+    transform()
+
+    # Step 3: Sink (store) the processed data
+    sink()
+
+if __name__ == "__main__":
+    main()  # Execute the main function when the script is run
+```
+
 
 ## 💻 Usage
 
